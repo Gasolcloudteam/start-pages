@@ -2,7 +2,7 @@ html{
 	overflow: hidden !important;
 }
 body{
-	background-image: url(https://b.zhutix.com/bizhi/ysdmnh/11.jpg);
+	background-image: url(/img/bg.jpg);
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
@@ -10,7 +10,7 @@ body{
 	
 }
 .bg{
-	background-image: url(https://b.zhutix.com/bizhi/ysdmnh/11.jpg);
+	background-image: url(/img/bg2.jpg);
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
