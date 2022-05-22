@@ -2,7 +2,7 @@
 
 # KStart
 # By: Dreamer-Paul
-# Last Update: 2022.3.27
+# Last Update: 2022.5.19
 
 一个简洁轻巧的起始页
 
@@ -48,6 +48,7 @@ function KStart() {
   };
 
   const data = {
+    env: undefined,
     ver: "1.1.0",
     timer: "",
     window: 0,
@@ -66,6 +67,11 @@ function KStart() {
         url: "https://api.paugram.com/bing",
         set: "center/cover no-repeat",
       },
+      {
+        name: "Unsplash 随机图片",
+        url: "https://source.unsplash.com/random/1920x1080",
+        set: "center/cover no-repeat",
+      }
     ],
     search_method: [
       {
@@ -406,6 +412,50 @@ function KStart() {
         }
       };
     },
+    // 初始化公共导航列表的拖拽功能
+    initDragNavi: () => {
+      let fromEl = null;
+      let fromId = null;
+
+      const onDragStart = ev => {
+        fromEl = ev.target;
+        fromId = ev.target.getAttribute("data-id");
+      }
+
+      const onDragOver = ev => {
+        ev.preventDefault();
+      }
+
+      const onDrop = ev => {
+        const to = ev.currentTarget;
+
+        const toId = to.getAttribute("data-id");
+        const set_sites = data.user_set.sites;
+
+        const _fromIdValue = set_sites.indexOf(Number(fromId));
+        const _toIdValue = set_sites.indexOf(Number(toId));
+
+        set_sites.splice(_toIdValue, 0, set_sites.splice(_fromIdValue, 1)[0]);
+
+        if (_fromIdValue > _toIdValue) {
+          fromEl.parentElement.insertBefore(fromEl, to);
+        }
+        else {
+          fromEl.parentElement.insertBefore(fromEl, to.nextSibling);
+        }
+
+        methods.setStorage();
+        methods.setMulSelectValue(obj.settings.sites, data.user_set.sites);
+      }
+
+      for (item of obj.main.sites.childNodes) {
+        item.ondragstart = onDragStart;
+        item.ondragover = onDragOver;
+        item.ondrop = onDrop;
+
+        item.setAttribute("draggable", true);
+      }
+    }
   };
 
   modifys.initBody();
@@ -417,23 +467,25 @@ function KStart() {
     const user = methods.getUser();
 
     // 读取在线或本地数据
-    if(user){
+    if (user) {
       const url = `https://dreamer-paul.github.io/KStart-Sites/${user}.json`;
 
       console.warn("Web mode");
+      data.env = "web";
 
-      modifys.hideSettingsButton();
-
-      return fetch(url).then((res) => res.json());
+      return fetch(url).then((res) => res.json()).catch(err => {
+        data.env = "local";
+        ks.notice("获取数据出错啦", { color: "red" });
+        return methods.getStorage();
+      });
     }
 
     console.warn("Local mode");
+    data.env = "local";
 
-    return false;
-  }).then((webData) => {
-    const storage = webData || methods.getStorage();
-
-    storage && methods.setUserSettings(storage);
+    return methods.getStorage();
+  }).then((userData) => {
+    userData && methods.setUserSettings(userData);
 
     const { sites, custom } = data.user_set;
 
@@ -453,8 +505,10 @@ function KStart() {
     else{
       console.error("这个一般不会触发吧？");
     }
-
     data.user_set.background && modifys.checkDarkMode();
+
+    data.env === "web" && modifys.hideSettingsButton();
+    data.env === "local" && modifys.initDragNavi();
 
     modifys.changeSearch(data.user_set.search);
     modifys.initSettingForm();
