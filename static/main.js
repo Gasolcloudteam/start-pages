@@ -2,7 +2,7 @@
 
 # KStart
 # By: Dreamer-Paul
-# Last Update: 2022.5.19
+# Last Update: 2022.5.28
 
 一个简洁轻巧的起始页
 
@@ -13,6 +13,7 @@
 function KStart() {
   const obj = {
     header: {
+      edit: ks.select(".action-btn.edit"),
       updated: ks.select(".action-btn.updated"),
       about: ks.select(".action-btn.about"),
       setting: ks.select(".action-btn.setting"),
@@ -27,12 +28,14 @@ function KStart() {
     },
     window: {
       wrap: ks.select("window"),
-      item: ks(".the-window"),
+      item: ks(".the-window, .the-drawer"),
     },
     settings: {
       search: ks.select("[name=search]"),
       background: ks.select("[name=background]"),
       sites: ks.select("[name=sites]"),
+      auto_focus: ks.select("[name=auto_focus]"),
+      low_animate: ks.select("[name=low_animate]")
     },
     settingBtn: {
       reset: ks.select("#set-reset"),
@@ -40,16 +43,20 @@ function KStart() {
       output: ks.select("#set-output"),
       file: ks.select("#set-file"),
     },
+    drawer: {
+      sites: ks.select(".the-drawer .sites")
+    },
 
     // 不渲染的元素
     _internal: {
       link: ks.create("a"),
+      dragFrom: null
     },
   };
 
   const data = {
     env: undefined,
-    ver: "1.1.0",
+    ver: "1.2.0",
     timer: "",
     window: 0,
     sites: [],
@@ -105,9 +112,22 @@ function KStart() {
         url: "https://duckduckgo.com/?q=%s",
       },
     ],
+    motion_reduced_enum: [
+      {
+        name: "自适应",
+      },
+      {
+        name: "开启",
+      },
+      {
+        name: "关闭",
+      },
+    ],
     user_set: {
       search: 0,
       background: 0,
+      auto_focus: false,
+      low_animate: 0,
       sites: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 28, 31, 35],
       custom: [],
     },
@@ -140,17 +160,17 @@ function KStart() {
       return name ? name[1] : false;
     },
 
-    createItem: (item, key) => {
+    createNaviItem: (item, key) => {
       const icon = item.icon ? `<i class="${item.icon}"></i>` : item.name.substr(0, 1);
       const color = item.color || Math.random().toString(16).substring(-6);
 
-      return ks.create("a", {
+      const el = ks.create("a", {
         href: item.url,
         class: "item",
         attr: [
           {
             name: "data-id",
-            value: key,
+            value: key ?? -1,
           },
           {
             name: "target",
@@ -164,33 +184,64 @@ function KStart() {
           <p class="navi-title">${item.name}</p>`
         )
       });
+
+      data.env === "local" && modifys.initDragNavi(el);
+
+      return el;
     },
+
+    // 弹窗和抽屉
     openWindow: (key) => {
       data.window = key;
+
       obj.window.wrap.classList.add("active");
       obj.window.item[key].classList.add("active");
+      obj.window.item[key].classList.add("started");
+
+      // 上次操作可能被取消，强制清除
+      obj.window.item[key].classList.remove("closed");
+
+      data.timer = clearTimeout(data.timer);
+      data.timer = setTimeout(methods.openWindowEnd, 300);
+    },
+    openWindowEnd: () => {
+      obj.window.item[data.window].classList.remove("started");
     },
     closeWindow: () => {
-      data.timer = clearTimeout(methods.closeWindow);
+      obj.window.wrap.classList.remove("active");
+      obj.window.item[data.window].classList.add("closed");
+
+      // 上次操作可能被取消，强制清除
+      obj.window.item[data.window].classList.remove("started");
+
+      data.timer = clearTimeout(data.timer);
+      data.timer = setTimeout(methods.closeWindowEnd, 300);
+    },
+    closeWindowEnd: () => {
+      data.timer = clearTimeout(data.timer);
 
       obj.window.item[data.window].classList.remove("closed");
       obj.window.item[data.window].classList.remove("active");
-
       obj.window.wrap.classList.remove("active");
     },
-    closeWindow2: () => {
-      if(!data.timer){
-        data.timer = setTimeout(methods.closeWindow, 300);
+
+    // 输入 Value 处理
+    parseValue: (type, value) => {
+      // Checkbox 直接返回 boolean
+      if (type === "checked") {
+        return value;
       }
 
-      obj.window.item[data.window].classList.add("closed");
+      const _checkNumber = Number(value);
+
+      return isNaN(_checkNumber) ? value : _checkNumber;
     },
 
     // 读取表单转数组
     getMulSelectValue: (el) => {
       let selected = [];
 
-      for(const item of el){
+      for (const item of el) {
         item.selected && selected.push(parseInt(item.value));
       }
 
@@ -198,7 +249,7 @@ function KStart() {
     },
     // 读取数组转表单
     setMulSelectValue: (el, value) => {
-      for(const item of value){
+      for (const item of value) {
         el[item].selected = true;
       }
     },
@@ -206,6 +257,10 @@ function KStart() {
 
   // 涉及到 DOM 交互的操作
   const modifys = {
+    // 全局委托，用于隐藏搜索下拉框
+    onBodyClick: (ev) => {
+      ev.target.className !== "search-select" && obj.main.search.classList.remove("active");
+    },
     // 搜索里面的按钮
     selectSearchButton: () => {
       const { search } = obj.main;
@@ -218,13 +273,48 @@ function KStart() {
     },
 
     // 右上方的按钮
-    hideSettingsButton: () => {
+    hideModifiedButton: () => {
+      obj.header.edit.setAttribute("hidden", "");
       obj.header.setting.setAttribute("hidden", "");
+    },
+    editButton: () => {
+      methods.openWindow(3);
     },
     updatedButton: () => {
       methods.openWindow(0);
       localStorage.setItem("paul-ver", data.ver);
       obj.header.updated.classList.remove("active");
+    },
+    aboutButton: () => {
+      methods.openWindow(1);
+    },
+    settingButton: () => {
+      methods.openWindow(2);
+    },
+
+    // 导航项点击，创建或删除已经设置的导航项目
+    siteItemButton: (ev) => {
+      const siteID = Number(ev.target.dataset.id);
+      const siteIndex = data.user_set.sites.indexOf(siteID);
+
+      ev.target.classList.toggle("active");
+
+      // 删除
+      if (siteIndex > -1) {
+        data.user_set.sites.splice(siteIndex, 1);
+
+        obj.main.sites.childNodes[siteIndex].remove();
+      }
+      // 添加
+      else {
+        data.user_set.sites.push(siteID);
+
+        const newSiteItem = methods.createNaviItem(data.sites[siteID], siteID, true);
+
+        obj.main.sites.appendChild(newSiteItem);
+      }
+
+      methods.setStorage();
     },
 
     // 设置里面的按钮
@@ -237,7 +327,7 @@ function KStart() {
       obj.settingBtn.file.click();
     },
     outputButton: () => {
-      const blob = new Blob([ JSON.stringify(data.user_set, null, 2) ], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(data.user_set, null, 2)], { type: "application/json" });
 
       obj._internal.link.href = URL.createObjectURL(blob);
       obj._internal.link.download = `userset-${parseInt(new Date().getTime() / 1000)}.json`;
@@ -248,18 +338,18 @@ function KStart() {
     fileInputChange: (e) => {
       const file = e.target.files && e.target.files[0];
 
-      if(!file){
+      if (!file) {
         console.log("🔮 也许是不存在的操作？");
         return;
       }
 
-      if(file.type !== "application/json"){
+      if (file.type !== "application/json") {
         ks.notice("导入的文件必须是 JSON 格式", { color: "red", time: 3000 });
         return;
       }
 
       file.text().then((text) => {
-        try{
+        try {
           const json = JSON.parse(text);
 
           data.user_set = json;
@@ -267,129 +357,58 @@ function KStart() {
 
           ks.notice("导入成功，刷新页面后生效！", { color: "green", time: 5000 });
         }
-        catch(e){
+        catch (e) {
           ks.notice("JSON 文件格式错误，请检查", { color: "red", time: 3000 });
           return;
         }
       });
     },
 
+    // 拖拽导航项目
+    onNaviDragStart: (ev) => {
+      obj._internal.dragFrom = ev.target;
+    },
+    onNaviDragOver: (ev) => {
+      ev.preventDefault();
+    },
+    onNaviDrop: (ev) => {
+      const from = obj._internal.dragFrom;
+      const to = ev.currentTarget;
+
+      const toId = to.getAttribute("data-id");
+      const set_sites = data.user_set.sites;
+
+      const _fromIdValue = set_sites.indexOf(Number(from.getAttribute("data-id")));
+      const _toIdValue = set_sites.indexOf(Number(toId));
+
+      set_sites.splice(_toIdValue, 0, set_sites.splice(_fromIdValue, 1)[0]);
+
+      if (_fromIdValue > _toIdValue) {
+        from.parentElement.insertBefore(from, to);
+      }
+      else {
+        from.parentElement.insertBefore(from, to.nextSibling);
+      }
+
+      methods.setStorage();
+    },
+
     // 修改搜索方式
     changeSearch: (key) => {
-      const { search } = obj.main;
-
-      search.classList.remove("active");
       data.user_set.search = key;
 
-      if(data.search_method[key].icon){
+      if (data.search_method[key].icon) {
         obj.main.select.innerHTML = `<i class="iconfont icon-${data.search_method[key].icon}"></i>`
       }
     },
+    // 初始化背景和深色背景模式检测
+    initBackground: () => {
+      if (data.user_set.background == 0) {
+        obj.main.bg.style = "";
 
-    // 初始化主体的元素
-    initBody: () => {
-      // 搜索
-      obj.main.select.onclick = modifys.selectSearchButton;
-      obj.main.submit.onclick = modifys.submitSearchButton;
-
-      data.search_method.forEach((item, key) => {
-        const a = ks.create("div", {
-          class: "item",
-          html: `<i class="iconfont icon-${item.icon}"></i>${item.name}`,
-          parent: obj.main.search
-        });
-
-        a.onclick = () => modifys.changeSearch(key);
-      });
-
-      // 打开按钮
-      obj.header.updated.onclick = modifys.updatedButton;
-      obj.header.about.onclick = () => {
-        methods.openWindow(1);
-      };
-      obj.header.setting.onclick = () => {
-        methods.openWindow(2);
-      };
-
-      // 关闭面板
-      obj.window.wrap.onclick = (e) => {
-        const isCloseBtn = e.target.nodeName === "BUTTON" && e.target.dataset.type === "close";
-        const isWindow = e.target == obj.window.wrap;
-
-        (isWindow || isCloseBtn) && methods.closeWindow2();
-      };
-
-      // 重置按钮
-      obj.settingBtn.reset.onclick = modifys.clearButton;
-      obj.settingBtn.input.onclick = modifys.inputButton;
-      obj.settingBtn.output.onclick = modifys.outputButton;
-      obj.settingBtn.file.onchange = modifys.fileInputChange;
-
-      // 版本更新提示
-      if(localStorage.getItem("paul-ver") !== data.ver){
-        obj.header.updated.classList.add("active");
+        return;
       }
-    },
 
-    // 初始化设置表单项
-    initSettingForm: () => {
-      const set = data.user_set;
-
-      for(item in set){
-        if(!obj.settings[item]) return;
-
-        let type, i = item;
-
-        switch(obj.settings[item].type){
-          case "text": type = "value"; break;
-          case "checkbox": type = "checked"; break;
-          case "select-one": type = "value"; break;
-          case "select-multiple": type = "options"; break;
-        }
-
-        // 是下拉框，遍历生成
-        if(obj.settings[item].type.indexOf("select") === 0 && obj.settings[item].dataset.key){
-          data[obj.settings[item].dataset.key].forEach((sitem, key) => {
-            ks.create("option", {
-              text: sitem.name,
-              attr: {
-                name: "value",
-                value: key,
-              },
-              parent: obj.settings[item],
-            });
-          });
-        }
-
-        if(type !== "options"){
-          obj.settings[item][type] = set[item];
-
-          obj.settings[item].onchange = (ev) => {
-            data.user_set[i] = ev.target[type];
-
-            methods.setStorage();
-
-            ks.notice("设置已保存至本地！", { color: "green", time: 3000 });
-          };
-        }
-        else{
-          // 设置表单
-          methods.setMulSelectValue(obj.settings[item], set[item]);
-
-          obj.settings[item].onchange = () => {
-            // 读取表单
-            data.user_set[i] = methods.getMulSelectValue(obj.settings[i]);
-
-            methods.setStorage();
-
-            ks.notice("设置已保存至本地！", { color: "green", time: 3000 });
-          };
-        }
-      }
-    },
-
-    // 深色背景模式检测
-    checkDarkMode: () => {
       const img = new Image();
       img.crossOrigin = "Anonymous";
       img.src = data.background_type[data.user_set.background].url;
@@ -407,54 +426,230 @@ function KStart() {
 
         const imgData = context.getImageData(0, 0, 1, 1).data;
 
-        if(imgData[0] <= 180 || (imgData[1] <= 180) | (imgData[2] <= 180)){
+        if (imgData[0] <= 180 || (imgData[1] <= 180) | (imgData[2] <= 180)) {
           document.body.classList.add("dark");
+        }
+        else {
+          document.body.classList.remove("dark");
         }
       };
     },
-    // 初始化公共导航列表的拖拽功能
-    initDragNavi: () => {
-      let fromEl = null;
-      let fromId = null;
+    // 自动聚焦到搜索框
+    focusSearchInput: () => {
+      obj.main.input.focus();
+    },
+    // 初始化媒体查询事件监听
+    initMediaQueryListener: () => {
+      // prefers-reduced-motion 事件监听
+      window.matchMedia("(prefers-reduced-motion: reduce)").addListener((e) => {
+        // 当 data.user_set.low_animate 不为 0(自适应) 时，不进行处理
+        if(data.user_set.low_animate !== 0) return;
 
-      const onDragStart = ev => {
-        fromEl = ev.target;
-        fromId = ev.target.getAttribute("data-id");
-      }
-
-      const onDragOver = ev => {
-        ev.preventDefault();
-      }
-
-      const onDrop = ev => {
-        const to = ev.currentTarget;
-
-        const toId = to.getAttribute("data-id");
-        const set_sites = data.user_set.sites;
-
-        const _fromIdValue = set_sites.indexOf(Number(fromId));
-        const _toIdValue = set_sites.indexOf(Number(toId));
-
-        set_sites.splice(_toIdValue, 0, set_sites.splice(_fromIdValue, 1)[0]);
-
-        if (_fromIdValue > _toIdValue) {
-          fromEl.parentElement.insertBefore(fromEl, to);
+        if (e.matches) {
+          document.body.classList.add("low-animate");
+          ks.notice("检测到减弱动画模式，已为你减弱动画效果", { color: "green", time: 2000 });
         }
         else {
-          fromEl.parentElement.insertBefore(fromEl, to.nextSibling);
+          document.body.classList.remove("low-animate");
+          ks.notice("减弱动画模式关闭，已启用完整动画效果", { color: "green", time: 2000 });
+        }
+      });
+    },
+    // 减淡动画
+    initLowAnimate: () => {
+      // 兼容性处理：对旧配置中 boolean 类型的配置项进行转换
+      if (data.user_set.low_animate === true) {
+        data.user_set.low_animate = 1;
+      }
+      else if (data.user_set.low_animate === false) {
+        data.user_set.low_animate = 2;
+      }
+
+      switch (data.user_set.low_animate) {
+        case 1:
+          // 开启
+          document.body.classList.add("low-animate");
+          break;
+        case 2:
+          // 关闭
+          document.body.classList.remove("low-animate");
+          break;
+        default:
+          // 自适应
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? document.body.classList.add("low-animate")
+            : document.body.classList.remove("low-animate");
+          break;
+      }
+    },
+
+    // 设置项被修改
+    onSettingChange: (name) => {
+      if (name === "background") {
+        modifys.initBackground();
+      }
+      else if (name === "search") {
+        ks.notice("默认搜索引擎已修改，刷新后生效", { color: "green", time: 3000 });
+      }
+      else if (name === "low_animate") {
+        modifys.initLowAnimate();
+      }
+    },
+
+    // 初始化主体的元素（不受限于用户数据）
+    initBody: () => {
+      // 全局委托，用于隐藏搜索下拉框
+      document.body.onclick = modifys.onBodyClick;
+
+      // 搜索
+      obj.main.select.onclick = modifys.selectSearchButton;
+      obj.main.submit.onclick = modifys.submitSearchButton;
+
+      data.search_method.forEach((item, key) => {
+        const el = ks.create("div", {
+          class: "item",
+          html: `<i class="iconfont icon-${item.icon}"></i>${item.name}`,
+          parent: obj.main.search
+        });
+
+        el.onclick = () => modifys.changeSearch(key);
+      });
+
+      // 打开按钮
+      obj.header.edit.onclick = modifys.editButton;
+      obj.header.updated.onclick = modifys.updatedButton;
+      obj.header.about.onclick = modifys.aboutButton;
+      obj.header.setting.onclick = modifys.settingButton;
+
+      // 关闭面板
+      obj.window.wrap.onclick = (e) => {
+        const isCloseBtn = e.target.nodeName === "BUTTON" && e.target.dataset.type === "close";
+        const isWindow = e.target == obj.window.wrap;
+
+        (isWindow || isCloseBtn) && methods.closeWindow();
+      };
+
+      // 重置按钮
+      obj.settingBtn.reset.onclick = modifys.clearButton;
+      obj.settingBtn.input.onclick = modifys.inputButton;
+      obj.settingBtn.output.onclick = modifys.outputButton;
+      obj.settingBtn.file.onchange = modifys.fileInputChange;
+
+      // 版本更新提示
+      if (localStorage.getItem("paul-ver") !== data.ver) {
+        obj.header.updated.classList.add("active");
+      }
+    },
+
+    // 初始化导航项目
+    initNavi: () => {
+      const { sites, custom } = data.user_set;
+
+      // 用户自定义站点
+      if (custom && Array.isArray(custom)) {
+        custom.forEach((item) => {
+          obj.main.sites.appendChild(methods.createNaviItem(item));
+        });
+      }
+
+      // 用户选中的预设站点
+      if (sites && Array.isArray(sites)) {
+        sites.forEach((item) => {
+          obj.main.sites.appendChild(methods.createNaviItem(data.sites[item], item));
+        });
+      }
+      else {
+        console.error("这个一般不会触发吧？");
+      }
+    },
+
+    // 初始化设置表单项
+    initSettingForm: () => {
+      const set = data.user_set;
+
+      for (item in set) {
+        if (!obj.settings[item]) return;
+
+        let type, i = item;
+
+        switch (obj.settings[item].type) {
+          case "text": type = "value"; break;
+          case "checkbox": type = "checked"; break;
+          case "select-one": type = "value"; break;
+          // ! 暂时没有使用
+          case "select-multiple": type = "options"; break;
         }
 
-        methods.setStorage();
-        methods.setMulSelectValue(obj.settings.sites, data.user_set.sites);
-      }
+        // 是下拉框，遍历生成（只有 Select 才会有 key 这个东西）
+        if (obj.settings[item].type.indexOf("select") === 0 && obj.settings[item].dataset.key) {
+          data[obj.settings[item].dataset.key].forEach((sitem, key) => {
+            ks.create("option", {
+              text: sitem.name,
+              attr: {
+                name: "value",
+                value: key,
+              },
+              parent: obj.settings[item],
+            });
+          });
+        }
 
-      for (item of obj.main.sites.childNodes) {
-        item.ondragstart = onDragStart;
-        item.ondragover = onDragOver;
-        item.ondrop = onDrop;
+        // Input / Checkbox / Select
+        if (type !== "options") {
+          obj.settings[item][type] = set[item];
 
-        item.setAttribute("draggable", true);
+          obj.settings[item].onchange = (ev) => {
+            data.user_set[i] = methods.parseValue(type, ev.target[type]);
+
+            methods.setStorage();
+            modifys.onSettingChange(i);
+          };
+        }
+        // Multiple Select
+        else {
+          // 设置表单
+          methods.setMulSelectValue(obj.settings[item], set[item]);
+
+          obj.settings[item].onchange = () => {
+            // 读取表单
+            data.user_set[i] = methods.parseValue(type, methods.getMulSelectValue(obj.settings[i]));
+
+            methods.setStorage();
+            modifys.onSettingChange(i);
+          };
+        }
       }
+    },
+
+    // 初始化公共导航列表的拖拽功能
+    initDragNavi: (el) => {
+      if (el.dataset.id == -1) return;
+
+      el.ondragstart = modifys.onNaviDragStart;
+      el.ondragover = modifys.onNaviDragOver;
+      el.ondrop = modifys.onNaviDrop;
+
+      el.setAttribute("draggable", true);
+    },
+
+    // 初始化抽屉里面的导航项目
+    initDrawerItems: () => {
+      data.sites.forEach((site, key) => {
+        const item = ks.create("span", {
+          text: site.name,
+          attr: {
+            name: "data-id",
+            value: key,
+          },
+          parent: obj.drawer.sites,
+        });
+
+        if (data.user_set.sites.includes(key)) {
+          item.classList.add("active");
+        }
+
+        item.onclick = modifys.siteItemButton;
+      });
     }
   };
 
@@ -487,31 +682,18 @@ function KStart() {
   }).then((userData) => {
     userData && methods.setUserSettings(userData);
 
-    const { sites, custom } = data.user_set;
+    modifys.initNavi();
+    modifys.initBackground();
+    modifys.initMediaQueryListener();
+    modifys.initLowAnimate();
 
-    // 用户自定义站点
-    if(custom && Array.isArray(custom)){
-      custom.forEach((item) => {
-        obj.main.sites.appendChild(methods.createItem(item));
-      });
-    }
+    data.env === "web" && modifys.hideModifiedButton();
 
-    // 用户选中的预设站点
-    if(sites && Array.isArray(sites)){
-      sites.forEach((item) => {
-        obj.main.sites.appendChild(methods.createItem(data.sites[item], item));
-      });
-    }
-    else{
-      console.error("这个一般不会触发吧？");
-    }
-    data.user_set.background && modifys.checkDarkMode();
-
-    data.env === "web" && modifys.hideSettingsButton();
-    data.env === "local" && modifys.initDragNavi();
+    data.user_set.auto_focus && modifys.focusSearchInput();
 
     modifys.changeSearch(data.user_set.search);
     modifys.initSettingForm();
+    modifys.initDrawerItems();
   });
 }
 
