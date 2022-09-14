@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星尘起始页</title>
+    <title>奇趣起始页</title>
     <link rel="icon" href="static/icon.png" sizes="192x192" />
     <link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/Dreamer-Paul/Kico-Style@master/kico.css" />
     <link rel="stylesheet" href="https://at.alicdn.com/t/font_1809713_7obvxtx02f.css" />
@@ -14,6 +14,9 @@
 </head>
 <body>
 <header>
+    <div class="action-btn edit" ks-tag="bottom" ks-text="管理导航项">
+        <i class="fa fa-edit"></i>
+    </div>
     <div class="action-btn updated" ks-tag="bottom" ks-text="更新日志">
         <i class="fa fa-bullhorn"></i>
     </div>
@@ -39,25 +42,54 @@
     <section class="navi-background"></section>
 </main>
 <footer>
-    <p>© <script>document.write(new Date().getFullYear())</script> <a href="https://xingchencloud.top/" target="_blank">枷锁云-星尘</a> | <a href="https://github.com/Dreamer-Paul/KStart" target="_blank">Github源项目</a></p>
+    <p>© <script>document.write(new Date().getFullYear())</script> <a href="https://paul.ren" target="_blank">奇趣保罗</a> | <a href="https://github.com/Dreamer-Paul/KStart" target="_blank">参与维护</a></p>
 </footer>
 <window>
     <section class="the-window updated">
         <div class="window-head">
             <button data-type="close">×</button>
-            <h3>更新说明</h3>
+            <h3>更新日志</h3>
         </div>
         <div class="window-body">
             <article>
                 <blockquote>本次更新基于Github项目:https://github.com/Dreamer-Paul/KStart</blockquote>
                 <h3>本次更新：</h3>
                 <ul>
-                    <li>2022-05-22：修复部分网络运营商dns污染问题，调用新的cdn</li>
-                    <li>抄了一大堆代码，感谢原作者的开源贡献！</li>
-                    <li>原作者开源地址:<a href="https://github.com/Dreamer-Paul/KStart" target="_blank">点击跳转到GitHub仓库</a> </li>
-                    <li>本项目开源地址:<a href="https://github.com/Gasolcloudteam/start-pages" target="_blank">点击跳转到GitHub仓库</a> </li>
+                    <li>增加个人设置导入导出功能，数据丢失是不存在的啦！</li>
+                    <li>增加夜间模式风格，只要你的电脑开启了就自动应用啦！</li>
+                    <li>自定义背景设置项，增加 Unsplash 随机图片源</li>
+                    <li>增加导航项拖拽排序功能</li>
+                    <li>增加导航项管理抽屉，可自由添加和删除你想要的导航项</li>
+                    <li>增加运行模式判断，用户模式下（地址栏输入 <code>?u=paul</code>）仅可读，无法使用任意编辑功能</li>
+                    <li>CSS 样式和细节优化，JS 代码逻辑优化</li>
+                    <li>优化关闭弹窗和抽屉的动画和速度</li>
+                    <li>解决使用抽屉添加导航项导致无法拖拽的问题</li>
+                    <li>打开起始页时，可自动聚焦到搜索框</li>
+                    <li>修复了搜索下拉框不会收回去的问题</li>
                 </ul>
 
+                <details>
+                    <summary>上次更新：</summary>
+                    <ul>
+                        <li>优化代码命名和逻辑，增加可读性，更新为现代 JavaScript 写法，鼓励你和我一起参与本项目的 <a href="https://github.com/Dreamer-Paul/KStart" target="_blank">维护</a>！</li>
+                        <li>窗口关闭按钮改为事件委托，修复用户模式下的 Bug（无法进行设置）</li>
+                        <li>增加了搜狗搜索</li>
+                        <li>替换了新的橙色 Logo</li>
+                        <li>调整导航项 DOM 结构，修改版权展示时间</li>
+                        <li>解决了在用户模式下（地址栏输入 <code>?u=paul</code>）配置会被本地覆盖的 Bug</li>
+                        <li>在用户模式下，禁止使用设置功能</li>
+                        <li>页脚版权的时间自动生成，过期（气）是不存在的啦！</li>
+                    </ul>
+                </details>
+
+                <details>
+                    <summary>更新预告：</summary>
+                    <ul>
+                        <li>更舒适的自定义站点列表体验</li>
+                        <li>可供设定你自己的壁纸（本地或外链）</li>
+                        <li>更易操作的设置面板（可能会在本项目的 2.0 版本实现）</li>
+                    </ul>
+                </details>
             </article>
         </div>
     </section>
@@ -68,23 +100,17 @@
         </div>
         <div class="window-body">
             <article>
-                <p><img src="https://www.dmoe.cc/random.php" alt="关于本起始页"></p>
+                <p><img src="static/about.jpg" alt="关于奇趣起始页"></p>
                 <p>欢迎使用星尘起始页！本项目建设于 2022/01/06，是一个面向部分群体使用的轻便项目，不排斥新用户。</p>
                 <p>关于预设主页导航URL内容请按住Ctrl+鼠标左键进行多选！</p>
                 <h3>使用了开源项目：</h3>
                 <ul>
-                    <li><a href="https://xiaoshu.app" target="_blank" rel="nofollow">小舒同学</a></li>
-                    <li><a href="https://limestart.cn" target="_blank" rel="nofollow">青柠起始页</a></li>
-                    <li><a href="https://yubius.com" target="_blank" rel="nofollow">布斯起始页（本项目的二改）</a></li>
-                </ul>
-                <h3>使用了开源项目：</h3>
-                <ul>
-                    <li><a href="https://www.iconfont.cn" target="_blank" rel="nofollow">IconFont</a></li>
                     <li><a href="https://github.com/Dreamer-Paul/Kico-Style" target="_blank" rel="nofollow">Kico Style</a></li>
                     <li><a href="https://fontawesome.com" target="_blank" rel="nofollow">FontAwesome</a></li>
                 </ul>
                 <h3>使用了第三方服务：</h3>
                 <ul>
+                    <li><a href="https://www.iconfont.cn" target="_blank" rel="nofollow">IconFont</a></li>
                     <li><a href="https://api.paugram.com" target="_blank">保罗 API</a>（随机动漫壁纸、必应壁纸解析）</li>
                 </ul>
             </article>
@@ -106,9 +132,14 @@
                     <select name="background" data-key="background_type"></select>
                 </label>
                 <label>
-                    <span>可选的预设导航项</span>
-                    <select multiple name="sites" data-key="sites" style="height: 15em"></select>
+                    <span>减淡动画和视觉效果：</span>
+                    <select name="low_animate" data-key="motion_reduced_enum"></select>
                 </label>
+                <label>
+                    <span>自动聚焦到搜索框：</span>
+                    <input name="auto_focus" type="checkbox" class="switch" />
+                </label>
+                
                 <p class="btn-group">
                     <button class="btn small primary" id="set-reset" title="重置个人设置为默认值">重置为默认</button>
                     <button class="btn small transparent" id="set-input" title="导入个人设置">导入</button>
@@ -116,6 +147,16 @@
                     <input type="file" id="set-file" hidden />
                 </p>
             </fieldset>
+        </div>
+    </section>
+    <section class="the-drawer sites">
+        <div class="drawer-head">
+            <button data-type="close">×</button>
+            <h3>管理导航项</h3>
+        </div>
+        <div class="drawer-body">
+            <div class="sites"></div>
+            <p class="add-sites">若想扩展添加更多导航项，欢迎在源项目 Issues 区 <a href="https://github.com/Dreamer-Paul/KStart/issues/1" target="_blank">公共导航列表添加建议区</a> 留言讨论！</p>
         </div>
     </section>
 </window>
