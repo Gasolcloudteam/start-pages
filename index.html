@@ -1,142 +1,47 @@
 <!DOCTYPE html>
-<html lang="zh-cmn-hans" class="font-auto">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>叶玖洛の起始页</title>
-    <link rel="icon" href="static/icon.png" sizes="192x192" />
-    <link rel="stylesheet" href="https://fastly.jsdelivr.net/gh/Dreamer-Paul/Kico-Style@master/kico.css" />
-    <link rel="stylesheet" href="https://at.alicdn.com/t/font_1809713_7obvxtx02f.css" />
-    <link href="https://fastly.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="static/main.css" />
-    <script src="https://fastly.jsdelivr.net/gh/Dreamer-Paul/Kico-Style/kico.js" defer></script>
-    <script src="static/main.js" defer></script>
+    <title>玖洛起始页</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-    <div class="action-btn edit" ks-tag="bottom" ks-text="管理导航项">
-        <i class="fa fa-edit"></i>
-    </div>
-    <div class="action-btn updated" ks-tag="bottom" ks-text="更新日志">
-        <i class="fa fa-bullhorn"></i>
-    </div>
-    <div class="action-btn about" ks-tag="bottom" ks-text="关于">
-        <i class="fa fa-info-circle"></i>
-    </div>
-    <div class="action-btn setting" ks-tag="bottom" ks-text="设置">
-        <i class="fa fa-cog"></i>
-    </div>
-</header>
-<main>
-    <section class="navi-search">
-        <form class="input-box">
-            <div class="search-select" title="切换搜索引擎">
-                <div class="iconfont icon-baidu"></div>
-            </div>
-            <div class="search-selector"></div>
-            <input type="text" placeholder="搜索..."/>
-            <button class="btn transparent" title="搜索"><i class="fa fa-search"></i></button>
-        </form>
-    </section>
-    <section class="navi-items"></section>
-    <section class="navi-background"></section>
-</main>
-<footer>
-    <p>© <script>document.write(new Date().getFullYear())</script> <a href="https://xingchencloud.top/" target="_blank">叶玖洛·星尘</a> || <a href="https://github.com/Dreamer-Paul/KStart" target="_blank">参与维护源项目</a></p>
-    <p><a target="_blank" href="https://www.aliyun.com/minisite/goods?userCode=p9e3trrw">获取阿里云上云优惠</a> || <a target="_blank" href="https://list.xingchencloud.top/">所有站点汇总List</a></p>
-</footer>
-<window>
-    <section class="the-window updated">
-        <div class="window-head">
-            <button data-type="close">×</button>
-            <h3>更新日志</h3>
-        </div>
-        <div class="window-body">
-            <article>
-                <blockquote>本次更新基于Github项目:https://github.com/Dreamer-Paul/KStart</blockquote>
-                <h3>本次更新：</h3>
-                <ul>
-                    <li>增加个人设置导入导出功能，数据丢失是不存在的啦！</li>
-                    <li>增加夜间模式风格，只要你的电脑开启了就自动应用啦！</li>
-                    <li>自定义背景设置项，增加 Unsplash 随机图片源</li>
-                    <li>增加导航项管理抽屉，可自由添加和删除你想要的导航项</li>
-                    <li>增加运行模式判断，用户模式下（地址栏输入 <code>?u=paul</code>）仅可读，无法使用任意编辑功能</li>
-                    <li>CSS 样式和细节优化，JS 代码逻辑优化</li>
-                    <li>优化关闭弹窗和抽屉的动画和速度</li>
-                    <li>解决使用抽屉添加导航项导致无法拖拽的问题</li>
-                    <li>打开起始页时，可自动聚焦到搜索框</li>
-                    <li>修复了搜索下拉框不会收回去的问题</li>
-                </ul>
+    <!-- 壁纸切换 -->
+    <input type="hidden" id="useVideoWallpaper" value="true"> <!-- true为动态视频壁纸，false为静态壁纸 -->
 
-            </article>
+    <!-- 视频背景 -->
+    <div id="background">
+        <div class="blur-background"></div>
+        <video id="videoBg" autoplay muted loop onloadeddata="removeBlur()">
+            <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/v-11.mp4" type="video/mp4">
+        </video>
+        <img id="staticBg" src="https://img-baofun.zhhainiao.com/fs/045a793d520b182106a668ff4e727f39.jpg" alt="静态壁纸" style="display: none;" onerror="handleImageError()">
+    </div>
+
+    <!-- 搜索框与引擎切换 -->
+    <div class="search-container">
+        <div class="search-bar">
+            <select id="searchEngine" onchange="changeEngine()">
+                <option value="bing">Bing</option>
+                <option value="google">Google</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="输入搜索内容" onkeydown="checkEnter(event)">
+            <button id="searchButton" onclick="search()">搜索</button>
         </div>
-    </section>
-    <section class="the-window about">
-        <div class="window-head">
-            <button data-type="close">×</button>
-            <h3>关于本项目</h3>
-        </div>
-        <div class="window-body">
-            <article>
-                <p><img src="http://www.dmoe.cc/random.php" alt="关于星尘起始页"></p>
-                <p>欢迎使用叶玖洛の起始页！本项目建设于 2022/01/06，是一个面向部分群体使用的轻便项目，不排斥新用户。</p>
-                <p>本站基于奇趣起始页修改，感谢保罗！</p>
-                <h3>使用了开源项目：</h3>
-                <ul>
-                    <li><a href="https://github.com/Dreamer-Paul/Kico-Style" target="_blank" rel="nofollow">Kico Style</a></li>
-                    <li><a href="https://fontawesome.com" target="_blank" rel="nofollow">FontAwesome</a></li>
-                </ul>
-                <h3>使用了第三方服务：</h3>
-                <ul>
-                    <li><a href="https://www.iconfont.cn" target="_blank" rel="nofollow">IconFont</a></li>
-                    <li><a href="https://api.paugram.com" target="_blank">保罗 API</a>（随机动漫壁纸、必应壁纸解析）</li>
-                </ul>
-            </article>
-        </div>
-    </section>
-    <section class="the-window setting">
-        <div class="window-head">
-            <button data-type="close">×</button>
-            <h3>设置</h3>
-        </div>
-        <div class="window-body">
-            <fieldset>
-                <label>
-                    <span>默认搜索引擎：</span>
-                    <select name="search" data-key="search_method"></select>
-                </label>
-                <label>
-                    <span>自定义背景：</span>
-                    <select name="background" data-key="background_type"></select>
-                </label>
-                <label>
-                    <span>减淡动画和视觉效果：</span>
-                    <select name="low_animate" data-key="motion_reduced_enum"></select>
-                </label>
-                <label>
-                    <span>自动聚焦到搜索框：</span>
-                    <input name="auto_focus" type="checkbox" class="switch" />
-                </label>
-                
-                <p class="btn-group">
-                    <button class="btn small primary" id="set-reset" title="重置个人设置为默认值">重置为默认</button>
-                    <button class="btn small transparent" id="set-input" title="导入个人设置">导入</button>
-                    <button class="btn small transparent" id="set-output" title="导出个人设置">导出</button>
-                    <input type="file" id="set-file" hidden />
-                </p>
-            </fieldset>
-        </div>
-    </section>
-    <section class="the-drawer sites">
-        <div class="drawer-head">
-            <button data-type="close">×</button>
-            <h3>管理导航项</h3>
-        </div>
-        <div class="drawer-body">
-            <div class="sites"></div>
-            <p class="add-sites">若想扩展添加更多导航项，欢迎在源项目 Issues 区 <a href="https://github.com/Dreamer-Paul/KStart/issues/1" target="_blank">公共导航列表添加建议区</a> 留言讨论！</p>
-        </div>
-    </section>
-</window>
+    </div>
+
+    <!-- 时钟显示 -->
+    <div id="clock"></div>
+
+    <!-- 一言显示 -->
+    <div id="hitokoto"></div>
+
+    <!-- 页脚信息 -->
+    <footer id="footer">
+        <p>© 2024 玖洛起始页 | 友情链接：<a href="https://list.xingchencloud.top/" target="_blank" class="no-style">叶玖洛的主页</a>  <a href="https://team.xingchencloud.top/" target="_blank" class="no-style">枷锁云团队</a>  <a href="https://www.aliyun.com/minisite/goods?source=5176.11533457&userCode=p9e3trrw" target="_blank" class="no-style">阿里云优惠</a></p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>

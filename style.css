@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blur-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(211, 211, 211, 0.8); /* 浅灰色背景 */
+    filter: blur(10px);
+    z-index: 1;
+}
+
+#background video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    max-width: 600px;
+    padding: 15px;
+    backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+}
+
+.search-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 40px;
+    backdrop-filter: blur(15px);
+}
+
+#searchEngine, #searchInput, #searchButton {
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+    color: white;
+}
+
+#searchEngine {
+    background-color: rgba(50, 50, 50, 0.5);
+    border-radius: 40px 0 0 40px;
+    color: white;
+    flex: 1;
+}
+
+#searchInput {
+    flex: 3;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: black; /* 修改文字颜色为黑色 */
+    border-radius: 0;
+}
+
+#searchButton {
+    background-color: rgba(50, 50, 50, 0.5);
+    border-radius: 0 40px 40px 0;
+    color: white;
+    cursor: pointer;
+}
+
+/* 时钟样式 */
+#clock {
+    position: absolute;
+    top: calc(50% - 120px);
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* 超链接样式 */
+a.no-style {
+    color: inherit;
+    text-decoration: none;
+}
+
+#hitokoto {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* 页脚备案和版权信息 */
+footer {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .search-container {
+        width: 90%;
+        max-width: 90%;
+        flex-direction: column;
+    }
+
+    #searchEngine, #searchInput, #searchButton {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    #clock {
+        font-size: 24px;
+    }
+
+    #hitokoto {
+        font-size: 12px;
+    }
+
+    footer {
+        font-size: 12px;
+    }
+}
