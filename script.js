@@ -49,10 +49,10 @@ function initBackground() {
 // 在页面加载时初始化背景
 document.addEventListener('DOMContentLoaded', initBackground);
 
-// 移除高斯模糊背景
-function removeBlur() {
-    document.querySelector('.blur-background').style.display = 'none';
-}
+// 移除浅灰色遮罩
+// function removeBlur() {
+//     document.querySelector('.blur-background').style.display = 'none';
+// }
 
 // 时钟显示功能
 let is24HourFormat = false;
@@ -84,10 +84,12 @@ function fetchHitokoto() {
     fetch('https://v1.hitokoto.cn/')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('hitokoto').innerText = data.hitokoto;
+            // 将获取到的一言内容放入「」内
+            document.getElementById('hitokoto').innerText = `「${data.hitokoto}」`;
         })
         .catch(() => {
-            document.getElementById('hitokoto').innerText = '一言获取失败，请稍后重试。';
+            // 获取失败提示也放在「」内
+            document.getElementById('hitokoto').innerText = '「一言获取失败，请稍后重试。」';
         });
 }
 

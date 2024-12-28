@@ -15,23 +15,22 @@
     <!-- 背景设定 -->
     <div id="background">
         <div class="blur-background"></div>
-        <video id="videoBg" autoplay muted loop onloadeddata="removeBlur()">
+        <!-- <video id="videoBg" autoplay muted loop onloadeddata="removeBlur()"> -->
+        <video id="videoBg" autoplay muted loop>
             <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/v-31.mp4" type="video/mp4">
         </video>
-        <img id="staticBg" src="https://img-baofun.zhhainiao.com/fs/045a793d520b182106a668ff4e727f39.jpg" alt="静态壁纸" style="display: none;" onerror="handleImageError()">
+        <img id="staticBg" src="https://files.codelife.cc/wallhaven/full/ey/wallhaven-eyzx5k.jpg" alt="静态壁纸" style="display: none;" onerror="handleImageError()">
     </div>
 
     <!-- 搜索框与引擎切换 -->
-    <div class="search-container">
-        <div class="search-bar">
-            <select id="searchEngine" onchange="changeEngine()">
-                <option value="bing">Bing</option>
-                <option value="google">Google</option>
-            </select>
-            <input type="text" id="searchInput" placeholder="输入搜索内容" onkeydown="checkEnter(event)">
-            <button id="searchButton" onclick="search()">搜索</button>
-        </div>
-    </div>
+    <div class="search-bar">
+        <select id="searchEngine" onchange="changeEngine()"> <!-- 记忆用户选择的默认搜索引擎 -->
+            <option value="bing">Bing</option>
+            <option value="google">Google</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="请输入需要搜索的内容" onkeydown="checkEnter(event)">
+        <button id="searchButton" onclick="search()">搜索</button>
+    </div>    
 
     <!-- 时钟显示 -->
     <div id="clock"></div>
