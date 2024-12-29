@@ -8,14 +8,16 @@
     <link rel="stylesheet" href="style.css">
     <meta name="keywords" content="玖洛起始页全新设计，重构主打极致简约">
 </head>
+    <!-- 壁纸切换按钮 -->
+    <button id="toggleButton" class="toggle-button" data-tooltip="切换背景" onclick="toggleWallpaper()">切换背景</button>
+
 <body>
     <!-- 壁纸切换 -->
-    <input type="hidden" id="useVideoWallpaper" value="true"> <!-- true为动态视频壁纸，false为静态壁纸 -->
+    <!-- <input type="hidden" id="useVideoWallpaper" value="true"> true为动态视频壁纸，false为静态壁纸，本行代码版本迭代已弃用 -->
 
     <!-- 背景设定 -->
     <div id="background">
         <div class="blur-background"></div>
-        <!-- <video id="videoBg" autoplay muted loop onloadeddata="removeBlur()"> -->
         <video id="videoBg" autoplay muted loop>
             <source src="https://files.codelife.cc/itab/defaultWallpaper/videos/v-31.mp4" type="video/mp4">
         </video>

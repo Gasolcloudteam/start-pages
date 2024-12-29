@@ -19,16 +19,6 @@ body, html {
     overflow: hidden;
 }
 
-/* 浅灰色遮罩 */
-/* .blur-background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(211, 211, 211, 0.8);
-    filter: blur(10px);
-    z-index: 1;
-} */
-
 #background video {
     width: 100%;
     height: 100%;
@@ -129,6 +119,63 @@ a.no-style {
     text-decoration: none;
 }
 
+/* 切换按钮样式 */
+.toggle-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px 15px;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+}
+
+.toggle-button:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 提示词样式 */
+.toggle-button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    width: 120px;
+    bottom: -80%;
+    left: 50%;
+    transform: translateX(-70%);
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 12px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    /* 调整后响应速度更快 */
+    max-width: 80%;
+    box-sizing: border-box;
+}
+
+.toggle-button:hover::after {
+    opacity: 1;
+}
+
+/* 针对移动设备的响应式调整 */
+@media (max-width: 768px) {
+    .toggle-button::after {
+        bottom: -100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        white-space: normal;
+    }
+}
+
+/* 一言 */
 #hitokoto {
     position: absolute;
     bottom: 45px;

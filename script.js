@@ -32,27 +32,28 @@ function checkEnter(event) {
 }
 
 // 初始化背景
-function initBackground() {
-    const useVideoWallpaper = document.getElementById('useVideoWallpaper').value === 'true';
-    const videoBg = document.getElementById('videoBg');
-    const staticBg = document.getElementById('staticBg');
+function toggleWallpaper() {
+    const useVideoWallpaper = localStorage.getItem('useVideoWallpaper') === 'true';
+    localStorage.setItem('useVideoWallpaper', !useVideoWallpaper);
+    initBackground();
+    updateTooltip(); // 调用更新提示词的函数
+}
 
+function updateTooltip() {
+    const toggleButton = document.getElementById('toggleButton');
+    const useVideoWallpaper = localStorage.getItem('useVideoWallpaper') === 'true';
     if (useVideoWallpaper) {
-        videoBg.style.display = 'block';
-        staticBg.style.display = 'none';
+        toggleButton.setAttribute('data-tooltip', '切换到静态背景');
     } else {
-        videoBg.style.display = 'none';
-        staticBg.style.display = 'block';
+        toggleButton.setAttribute('data-tooltip', '切换到动态背景');
     }
 }
 
-// 在页面加载时初始化背景
-document.addEventListener('DOMContentLoaded', initBackground);
-
-// 移除浅灰色遮罩
-// function removeBlur() {
-//     document.querySelector('.blur-background').style.display = 'none';
-// }
+// 确保在页面加载时也调用一次 updateTooltip 函数
+document.addEventListener('DOMContentLoaded', () => {
+    initBackground();
+    updateTooltip();
+});
 
 // 时钟显示功能
 let is24HourFormat = false;
@@ -79,19 +80,47 @@ function updateClock() {
 // 定时更新时钟
 setInterval(updateClock, 1000);
 
-// 获取一言
-function fetchHitokoto() {
-    fetch('https://v1.hitokoto.cn/')
-        .then(response => response.json())
-        .then(data => {
-            // 将获取到的一言内容放入「」内
-            document.getElementById('hitokoto').innerText = `「${data.hitokoto}」`;
-        })
-        .catch(() => {
-            // 获取失败提示也放在「」内
-            document.getElementById('hitokoto').innerText = '「一言获取失败，请稍后重试。」';
-        });
+// 点击按钮时切换壁纸
+function initBackground() {
+    const useVideoWallpaper = localStorage.getItem('useVideoWallpaper') === 'true';
+    const videoBg = document.getElementById('videoBg');
+    const staticBg = document.getElementById('staticBg');
+    const toggleButton = document.getElementById('toggleButton');
+
+    if (useVideoWallpaper) {
+        // 显示动态壁纸
+        videoBg.style.display = 'block';
+        staticBg.style.display = 'none';
+        toggleButton.dataset.tooltip = '切换到静态背景';
+    } else {
+        // 显示静态壁纸
+        videoBg.style.display = 'none';
+        staticBg.style.display = 'block';
+        toggleButton.dataset.tooltip = '切换到动态背景';
+    }
 }
 
-// 获取一言显示
-fetchHitokoto();
+function toggleWallpaper() {
+    const useVideoWallpaper = localStorage.getItem('useVideoWallpaper') === 'true';
+    localStorage.setItem('useVideoWallpaper', !useVideoWallpaper);
+    initBackground();
+}
+
+// 当文档加载完毕时调用 initBackground
+document.addEventListener('DOMContentLoaded', initBackground);
+
+// 一言API
+function getHitokoto() {
+    fetch('https://v1.hitokoto.cn')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('hitokoto').innerText = data.hitokoto + ' ——「' + data.from + '」';
+        })
+        .catch(console.error);
+}
+
+// 页面加载时获取一言
+document.addEventListener('DOMContentLoaded', getHitokoto);
+
+// 定时更换一言
+setInterval(getHitokoto, 30000); // 每30秒更换一次
