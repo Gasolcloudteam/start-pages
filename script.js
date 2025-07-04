@@ -2,7 +2,9 @@
 let searchEngine = localStorage.getItem('searchEngine') || 'bing';
 const engines = {
     bing: 'https://www.bing.com/search?q=',
-    google: 'https://www.google.com/search?q='
+    google: 'https://www.google.com/search?q=',
+    yahoo: 'https://search.yahoo.com/search?p=',
+    yandex: 'https://yandex.com/search/?text='
 };
 
 // 初始化搜索引擎选择

@@ -87,17 +87,19 @@ body, html {
 /* 响应式优化 */
 @media (max-width: 480px) {
     .search-bar {
-        width: 90%; /* 宽度适配小屏幕 */
-        gap: 5px; /* 减少间距 */
+        width: 98%;
     }
-
-    #searchEngine, #searchButton {
-        font-size: 14px; /* 缩小字体 */
-        max-width: 80px; /* 减小最大宽度 */
+    #searchEngine, #searchButton, #searchInput {
+        font-size: 14px;
+        height: 36px;
     }
-
-    #searchInput {
-        font-size: 14px; /* 缩小字体 */
+    #searchEngine {
+        border-radius: 18px 0 0 18px;
+    }
+    #searchButton {
+        border-radius: 0 18px 18px 0;
+        width: 70px;
+        padding: 0 8px;
     }
 }
 
