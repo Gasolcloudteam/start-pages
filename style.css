@@ -25,6 +25,18 @@ body, html {
     object-fit: cover;
 }
 
+#background img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;   /* 保持比例填充，超出部分裁剪 */
+    object-position: center center;
+    z-index: 1;
+    pointer-events: none; /* 防止图片遮挡交互 */
+}
+
 /* 搜索栏样式 */
 .search-bar {
     position: absolute;
@@ -44,17 +56,59 @@ body, html {
     gap: 10px; /* 子元素间距 */
 }
 
-#searchEngine {
-    flex-shrink: 1; /* 防止被压缩 */
-    width: 25%; /* 占据一定宽度比例 */
-    max-width: 100px; /* 限制最大宽度 */
-    padding: 8px;
+/* 自定义搜索引擎下拉菜单样式 */
+.custom-select {
+    position: relative;
+    flex-shrink: 1;
+    width: 25%;
+    max-width: 100px;
+}
+
+.select-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: transparent; /* 默认完全透明 */
+    border: none; /* 移除边框 */
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
     font-size: 16px;
-    background: transparent; /* 背景透明 */
-    border: none;
-    outline: none;
-    color: black;
-    margin-right: 10px;
+}
+
+.select-button.active {
+    background-color: rgba(255, 255, 255, 0.5); /* 仅激活时显示背景 */
+}
+
+.arrow {
+    font-size: 12px;
+    margin-left: 5px;
+    opacity: 0.7; /* 箭头半透明 */
+}
+
+.select-menu {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.3); /* 与搜索框统一透明度 */
+    backdrop-filter: blur(15px); /* 与搜索框统一模糊效果 */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: none; /* 默认隐藏 */
+    z-index: 20;
+}
+
+.select-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.select-option:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 #searchInput {
@@ -84,20 +138,23 @@ body, html {
     transition: background-color 0.3s ease;
 }
 
+#searchButton:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
 /* 响应式优化 */
 @media (max-width: 480px) {
     .search-bar {
         width: 98%;
     }
-    #searchEngine, #searchButton, #searchInput {
+    .select-button, #searchButton, #searchInput {
         font-size: 14px;
         height: 36px;
     }
-    #searchEngine {
-        border-radius: 18px 0 0 18px;
+    .custom-select {
+        max-width: 80px;
     }
     #searchButton {
-        border-radius: 0 18px 18px 0;
         width: 70px;
         padding: 0 8px;
     }
@@ -113,6 +170,7 @@ body, html {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
 }
 
 /* 超链接样式 */
@@ -132,33 +190,33 @@ a.no-style {
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
     z-index: 10;
+    opacity: 0;
 }
 
 .toggle-button:hover {
     background-color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
 }
 
-/* 提示词样式 */
+/* 优化提示词背景样式 */
 .toggle-button::after {
     content: attr(data-tooltip);
     position: absolute;
-    width: 120px;
     bottom: -80%;
     left: 50%;
-    transform: translateX(-70%);
-    padding: 5px;
-    background-color: rgba(0, 0, 0, 0.5);
+    transform: translateX(-50%);
+    padding: 8px 12px; /* 增加内边距 */
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     font-size: 12px;
-    border-radius: 5px;
+    border-radius: 8px; /* 增大圆角 */
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
     white-space: nowrap;
-    /* 调整后响应速度更快 */
-    max-width: 80%;
+    width: auto; /* 自适应宽度 */
     box-sizing: border-box;
 }
 
@@ -170,10 +228,6 @@ a.no-style {
 @media (max-width: 768px) {
     .toggle-button::after {
         bottom: -100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        white-space: normal;
     }
 }
 
@@ -187,6 +241,7 @@ a.no-style {
     font-size: 14px;
     text-align: center;
     font-style: italic;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
 }
 
 /* 页脚备案和版权信息 */
@@ -197,4 +252,5 @@ footer {
     text-align: center;
     color: white;
     font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
 }
