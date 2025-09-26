@@ -11,8 +11,8 @@ const engines = {
 
 // 搜索建议API配置（已移除Yahoo）
 const suggestApis = {
-    bing: (query) => `http://api.bing.com/qsonhs.aspx?type=cb&q=${encodeURIComponent(query)}&cb=window.bing.sug`,
-    google: (query) => `http://suggestqueries.google.com/complete/search?client=youtube&q=${encodeURIComponent(query)}&jsonp=window.google.ac.h`
+    bing: (query) => `https://api.bing.com/qsonhs.aspx?type=cb&q=${encodeURIComponent(query)}&cb=window.bing.sug`,
+    google: (query) => `https://suggestqueries.google.com/complete/search?client=youtube&q=${encodeURIComponent(query)}&jsonp=window.google.ac.h`
 };
 
 // 防抖函数
