@@ -12,8 +12,46 @@
     <button id="toggleButton" class="toggle-button" data-tooltip="切换背景" onclick="toggleWallpaper()">切换背景</button>
 
 <body>
-    <!-- 壁纸切换 -->
-    <!-- <input type="hidden" id="useVideoWallpaper" value="true"> true为动态视频壁纸，false为静态壁纸，本行代码版本迭代已弃用 -->
+    <!-- 公告提示弹窗 -->
+    <div id="noticeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>使用提示（必读）</h3>
+            </div>
+            <div class="modal-body">
+                <p>鼠标放于网页右上角，当显示切换背景按钮后，可以切换为动态、静态背景壁纸。</p>
+                <p>搜索引擎可通过搜索框左侧下拉菜单进行切换，支持Bing、Google、Yahoo、Yandex、B站、抖音等。</p>
+                <p>搜索框下方会根据输入内容，实时显示搜索建议，点击建议可快速搜索。仅Google、Bing有公开的API支持搜索建议提示，其他引擎不支持。</p>
+                <p>哔哩哔哩、抖音这两个是视频，搜索出来跳转的内容与其平台有关，仅为方便搜视频使用，不建议平时作为搜索引擎使用！</p>
+                <p>右键点击起始页任意位置，可打开捷径菜单，支持编辑（删除）、新建（自定义快捷方式）、导入（恢复json）、导出（备份json）自己的快捷方式等功能。</p>
+                <p>长按捷径里面的快捷方式可以拖动排序哦。</p>
+                <p>如果有任何问题或建议，欢迎给我发邮件：<a href="mailto:2016122123.jou@vip.163.com">2016122123.jou@vip.163.com</a>
+                <p>点击不再提示，以后每次进入起始页不在弹出此弹窗（如果清除浏览器Cookie会丢失所有记录哦，包括捷径的快捷方式，平时注意备份！）。</p>
+                <!-- 可添加更多提示内容 -->
+            </div>
+            <div class="modal-footer">
+                <button id="btnNotShowAgain">不再提示</button>
+                <button id="btnConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右键菜单弹窗 -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-content">
+            <div class="context-menu-header">
+                <span>捷径</span>
+                <button id="closeContextMenu" class="close-btn">×</button>
+            </div>
+            <div id="shortcutsContainer" class="shortcuts-container"></div>
+            <div class="context-menu-footer">
+                <button id="btnEdit">编辑</button>
+                <button id="btnNew">新建</button>
+                <button id="btnImport">导入</button>
+                <button id="btnExport">导出</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 背景设定 -->
     <div id="background">

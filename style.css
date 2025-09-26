@@ -26,9 +26,9 @@ body, html {
     left: 0;
     width: 100vw;
     height: 100vh;
-    object-fit: cover;   /* 保持比例填充，超出部分裁剪 */
+    object-fit: cover;
     object-position: center center;
-    pointer-events: none; /* 防止图片遮挡交互 */
+    pointer-events: none;
 }
 
 /* 搜索容器 - 响应式优化 */
@@ -37,9 +37,9 @@ body, html {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%; /* 使用相对宽度 */
-    max-width: 600px; /* 最大宽度限制 */
-    min-width: 300px; /* 最小宽度保障 */
+    width: 90%;
+    max-width: 600px;
+    min-width: 300px;
 }
 
 /* 搜索栏样式 */
@@ -48,14 +48,13 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: nowrap; /* 确保横向排列 */
     padding: 10px 15px;
-    background-color: rgba(255, 255, 255, 0.3); /* 高斯模糊背景色 */
-    backdrop-filter: blur(15px); /* 高斯模糊效果 */
-    border-radius: 50px; /* 圆角效果，整体为椭圆形 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 轻微阴影效果 */
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     width: 100%;
-    gap: 10px; /* 子元素间距 */
+    gap: 10px;
 }
 
 /* 自定义搜索引擎下拉菜单样式 */
@@ -71,35 +70,28 @@ body, html {
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    background-color: transparent; /* 默认完全透明 */
-    border: none; /* 移除边框 */
+    background: transparent;
+    border: none;
     border-radius: 20px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-size: 16px;
 }
 
-.select-button.active {
-    background-color: rgba(255, 255, 255, 0.5); /* 仅激活时显示背景 */
-}
+.select-button.active { background-color: rgba(255, 255, 255, 0.5); }
 
-.arrow {
-    font-size: 12px;
-    margin-left: 5px;
-    opacity: 0.7; /* 箭头半透明 */
-}
+.arrow { font-size: 12px; margin-left: 5px; opacity: 0.7; }
 
 .select-menu {
     position: absolute;
     top: 110%;
     left: 0;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.3); /* 与搜索框统一透明度 */
-    backdrop-filter: blur(15px); /* 与搜索框统一模糊效果 */
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    display: none; /* 默认隐藏 */
+    display: none;
     z-index: 20;
 }
 
@@ -109,12 +101,10 @@ body, html {
     transition: background-color 0.2s ease;
 }
 
-.select-option:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
+.select-option:hover { background-color: rgba(255, 255, 255, 0.5); }
 
 #searchInput {
-    flex-grow: 1; /* 占据剩余空间 */
+    flex-grow: 1;
     padding: 10px;
     font-size: 16px;
     border: none;
@@ -122,67 +112,73 @@ body, html {
     background: transparent;
     color: black;
     margin: 0 10px;
-    min-width: 0; /* 防止溢出 */
+    min-width: 0;
 }
 
 #searchButton {
-    flex-shrink: 1; /* 防止被压缩 */
-    width: 25%; /* 占据一定宽度比例 */
+    flex-shrink: 1;
+    width: 25%;
     max-width: 100px;
-    text-align: center;
     padding: 8px;
     font-size: 16px;
     background: transparent;
-    border: 0px solid #ccc; /* 添加边框 */
+    border: none;
     border-radius: 20px;
     color: black;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-#searchButton:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
+#searchButton:hover { background-color: rgba(255, 255, 255, 0.5); }
 
-/* 搜索建议列表样式 - 包含自定义滚动条 */
+/* 搜索建议列表样式 */
 .suggestions-list {
     position: absolute;
-    top: calc(100% + 10px); /* 相对于搜索框底部定位 */
+    top: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100% - 20px); /* 比搜索框略窄 */
-    background-color: rgba(255, 255, 255, 0.3); /* 与搜索框统一透明度 */
-    backdrop-filter: blur(15px); /* 与搜索框统一模糊效果 */
+    width: calc(100% - 20px);
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 15; /* 降低z-index避免覆盖一言 */
-    max-height: 180px; /* 减小最大高度，避免覆盖底部 */
+    z-index: 15;
+    max-height: 180px;
     overflow-y: auto;
-    display: none; /* 默认隐藏 */
+    display: none;
 }
 
 /* 自定义滚动条样式 */
-.suggestions-list::-webkit-scrollbar {
-    width: 8px; /* 滚动条宽度 */
+.suggestions-list::-webkit-scrollbar,
+.shortcuts-container::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+    width: 8px;
 }
 
-.suggestions-list::-webkit-scrollbar-track {
-    border-radius: 8px; /* 轨道圆角 */
-    background: rgba(255, 255, 255, 0.1); /* 轨道背景 */
+.suggestions-list::-webkit-scrollbar-track,
+.shortcuts-container::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
 
-.suggestions-list::-webkit-scrollbar-thumb {
-    border-radius: 8px; /* 滑块圆角 */
-    background: rgba(255, 255, 255, 0.3); /* 滑块背景 */
-    backdrop-filter: blur(5px); /* 滑块高斯模糊 */
+.suggestions-list::-webkit-scrollbar-thumb,
+.shortcuts-container::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
     transition: background 0.3s ease;
 }
 
-.suggestions-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5); /* 滑块悬停效果 */
+.suggestions-list::-webkit-scrollbar-thumb:hover,
+.shortcuts-container::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
-/* 建议项样式 - 响应式字体大小 */
+/* 建议项样式 */
 .suggestion-item {
     padding: 10px 15px;
     cursor: pointer;
@@ -190,57 +186,9 @@ body, html {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 16px; /* 默认字体大小 */
 }
 
-.suggestion-item:hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* 响应式优化 */
-@media (max-width: 768px) {
-    .suggestion-item {
-        font-size: 14px; /* 平板设备字体大小 */
-    }
-    
-    .search-container {
-        width: 95%; /* 平板设备搜索容器宽度 */
-    }
-}
-
-@media (max-width: 480px) {
-    .search-bar {
-        width: 98%;
-        padding: 8px 12px;
-    }
-    
-    .select-button, #searchButton, #searchInput {
-        font-size: 14px;
-        height: 36px;
-    }
-    
-    .custom-select {
-        max-width: 80px;
-    }
-    
-    #searchButton {
-        width: 70px;
-        padding: 0 8px;
-    }
-    
-    .suggestions-list {
-        width: calc(98% - 20px);
-    }
-    
-    .suggestion-item {
-        font-size: 12px; /* 手机设备字体大小 */
-        padding: 8px 12px;
-    }
-    
-    #clock {
-        font-size: 28px; /* 手机设备时钟字体 */
-    }
-}
+.suggestion-item:hover { background-color: rgba(255, 255, 255, 0.5); }
 
 /* 时钟样式 */
 #clock {
@@ -252,14 +200,8 @@ body, html {
     font-size: 32px;
     font-weight: bold;
     text-align: center;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
-    z-index: 5; /* 确保在背景之上 */
-}
-
-/* 超链接样式 */
-a.no-style {
-    color: inherit;
-    text-decoration: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 5;
 }
 
 /* 切换按钮样式 */
@@ -283,40 +225,28 @@ a.no-style {
     opacity: 1;
 }
 
-/* 优化提示词背景样式 */
 .toggle-button::after {
     content: attr(data-tooltip);
     position: absolute;
     bottom: -80%;
     left: 50%;
     transform: translateX(-50%);
-    padding: 8px 12px; /* 增加内边距 */
+    padding: 8px 12px;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     font-size: 12px;
-    border-radius: 8px; /* 增大圆角 */
+    border-radius: 8px;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
     white-space: nowrap;
-    width: auto; /* 自适应宽度 */
-    box-sizing: border-box;
 }
 
-.toggle-button:hover::after {
-    opacity: 1;
-}
+.toggle-button:hover::after { opacity: 1; }
 
-/* 针对移动设备的响应式调整 */
-@media (max-width: 768px) {
-    .toggle-button::after {
-        bottom: -100%;
-    }
-}
-
-/* 一言 - 修复显示问题 */
+/* 一言样式 */
 #hitokoto {
-    position: fixed; /* 使用fixed定位确保在底部 */
+    position: fixed;
     bottom: 45px;
     left: 50%;
     transform: translateX(-50%);
@@ -324,20 +254,219 @@ a.no-style {
     font-size: 14px;
     text-align: center;
     font-style: italic;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
-    z-index: 5; /* 确保在背景之上，搜索建议之下 */
-    width: 90%; /* 限制宽度，避免文字溢出 */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    width: 90%;
     max-width: 600px;
+    z-index: 5;
 }
 
-/* 页脚备案和版权信息 */
+/* 页脚样式 */
 footer {
-    position: fixed; /* 使用fixed定位确保在底部 */
+    position: fixed;
     bottom: 10px;
     width: 100%;
     text-align: center;
     color: white;
     font-size: 14px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
-    z-index: 5; /* 确保在背景之上，搜索建议之下 */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    z-index: 5;
+}
+
+/* 页脚超链接样式修复 */
+footer a.no-style {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+footer a.no-style:hover {
+    text-decoration: underline;
+}
+
+/* 公告提示弹窗样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 15px;
+    max-height: calc(80vh - 120px);
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: right;
+}
+
+.modal-footer button {
+    margin-left: 10px;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+/* 右键菜单样式 */
+.context-menu {
+    display: none;
+    position: fixed;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+.context-menu-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.context-menu-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: inherit;
+}
+
+/* 快捷方式容器（统一样式 - 每行五个） */
+.shortcuts-container {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: calc(100% - 100px);
+    perspective: 1000px; /* 添加透视效果，增强水平拖动的视觉反馈 */
+}
+
+/* 快捷方式按钮样式（统一大小和外观） */
+.shortcut-item {
+    padding: 15px 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-sizing: border-box; /* 确保内边距和边框不影响元素总尺寸 */
+}
+
+.shortcut-item .delete-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    cursor: pointer;
+}
+
+.shortcut-item.edit-mode .delete-btn { display: flex; }
+
+.context-menu-footer {
+    padding: 10px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-around;
+}
+
+.context-menu-footer button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.context-menu-footer button:hover { background-color: rgba(255, 255, 255, 0.7); }
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .context-menu { width: 80%; height: 70%; }
+    .shortcuts-container { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .context-menu { width: 90%; height: 60%; }
+    .shortcuts-container { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 拖动相关样式 */
+.shortcut-item.dragging {
+    opacity: 0.7;
+    transform: scale(1.08);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: none; /* 拖动元素不使用过渡，避免位置跳动 */
+}
+
+/* 水平拖动时的特殊样式 */
+.shortcut-item.dragging.horizontal-drag {
+    transform: scale(1.08) rotateY(5deg); /* 轻微旋转增强方向感知 */
+}
+
+/* 优化占位符样式 */
+.shortcut-item.placeholder {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    transition: all 0.15s ease-out; /* 使用更快的过渡减少视觉闪烁 */
 }
