@@ -19,12 +19,7 @@ body, html {
     overflow: hidden;
 }
 
-#background video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
+#background video,
 #background img {
     position: absolute;
     top: 0;
@@ -33,16 +28,23 @@ body, html {
     height: 100vh;
     object-fit: cover;   /* 保持比例填充，超出部分裁剪 */
     object-position: center center;
-    z-index: 1;
     pointer-events: none; /* 防止图片遮挡交互 */
 }
 
-/* 搜索栏样式 */
-.search-bar {
+/* 搜索容器 - 响应式优化 */
+.search-container {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    width: 90%; /* 使用相对宽度 */
+    max-width: 600px; /* 最大宽度限制 */
+    min-width: 300px; /* 最小宽度保障 */
+}
+
+/* 搜索栏样式 */
+.search-bar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -52,7 +54,7 @@ body, html {
     backdrop-filter: blur(15px); /* 高斯模糊效果 */
     border-radius: 50px; /* 圆角效果，整体为椭圆形 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 轻微阴影效果 */
-    width: 600px;
+    width: 100%;
     gap: 10px; /* 子元素间距 */
 }
 
@@ -142,21 +144,101 @@ body, html {
     background-color: rgba(255, 255, 255, 0.5);
 }
 
+/* 搜索建议列表样式 - 包含自定义滚动条 */
+.suggestions-list {
+    position: absolute;
+    top: calc(100% + 10px); /* 相对于搜索框底部定位 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 20px); /* 比搜索框略窄 */
+    background-color: rgba(255, 255, 255, 0.3); /* 与搜索框统一透明度 */
+    backdrop-filter: blur(15px); /* 与搜索框统一模糊效果 */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 15; /* 降低z-index避免覆盖一言 */
+    max-height: 180px; /* 减小最大高度，避免覆盖底部 */
+    overflow-y: auto;
+    display: none; /* 默认隐藏 */
+}
+
+/* 自定义滚动条样式 */
+.suggestions-list::-webkit-scrollbar {
+    width: 8px; /* 滚动条宽度 */
+}
+
+.suggestions-list::-webkit-scrollbar-track {
+    border-radius: 8px; /* 轨道圆角 */
+    background: rgba(255, 255, 255, 0.1); /* 轨道背景 */
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+    border-radius: 8px; /* 滑块圆角 */
+    background: rgba(255, 255, 255, 0.3); /* 滑块背景 */
+    backdrop-filter: blur(5px); /* 滑块高斯模糊 */
+    transition: background 0.3s ease;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5); /* 滑块悬停效果 */
+}
+
+/* 建议项样式 - 响应式字体大小 */
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px; /* 默认字体大小 */
+}
+
+.suggestion-item:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
 /* 响应式优化 */
+@media (max-width: 768px) {
+    .suggestion-item {
+        font-size: 14px; /* 平板设备字体大小 */
+    }
+    
+    .search-container {
+        width: 95%; /* 平板设备搜索容器宽度 */
+    }
+}
+
 @media (max-width: 480px) {
     .search-bar {
         width: 98%;
+        padding: 8px 12px;
     }
+    
     .select-button, #searchButton, #searchInput {
         font-size: 14px;
         height: 36px;
     }
+    
     .custom-select {
         max-width: 80px;
     }
+    
     #searchButton {
         width: 70px;
         padding: 0 8px;
+    }
+    
+    .suggestions-list {
+        width: calc(98% - 20px);
+    }
+    
+    .suggestion-item {
+        font-size: 12px; /* 手机设备字体大小 */
+        padding: 8px 12px;
+    }
+    
+    #clock {
+        font-size: 28px; /* 手机设备时钟字体 */
     }
 }
 
@@ -171,6 +253,7 @@ body, html {
     font-weight: bold;
     text-align: center;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
+    z-index: 5; /* 确保在背景之上 */
 }
 
 /* 超链接样式 */
@@ -231,9 +314,9 @@ a.no-style {
     }
 }
 
-/* 一言 */
+/* 一言 - 修复显示问题 */
 #hitokoto {
-    position: absolute;
+    position: fixed; /* 使用fixed定位确保在底部 */
     bottom: 45px;
     left: 50%;
     transform: translateX(-50%);
@@ -242,15 +325,19 @@ a.no-style {
     text-align: center;
     font-style: italic;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
+    z-index: 5; /* 确保在背景之上，搜索建议之下 */
+    width: 90%; /* 限制宽度，避免文字溢出 */
+    max-width: 600px;
 }
 
 /* 页脚备案和版权信息 */
 footer {
-    position: absolute;
+    position: fixed; /* 使用fixed定位确保在底部 */
     bottom: 10px;
     width: 100%;
     text-align: center;
     color: white;
     font-size: 14px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 添加文字阴影 */
+    z-index: 5; /* 确保在背景之上，搜索建议之下 */
 }
