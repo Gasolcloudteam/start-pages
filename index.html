@@ -7,6 +7,39 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <meta name="keywords" content="玖洛起始页全新设计，重构主打极致简约">
+    <style>
+        /* 公告弹窗样式优化 */
+        .modal-body {
+            padding: 15px;
+            max-height: calc(80vh - 140px); /* 增加内容区域高度 */
+            overflow-y: auto;
+        }
+        .modal-body ul {
+            list-style: none; /* 移除默认列表圆点 */
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        .modal-body h4 {
+            margin: 15px 0 5px;
+            display: flex;
+            align-items: center;
+        }
+        .modal-body h4::after {
+            content: ".";
+            margin-left: 5px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: center; /* 按钮居中 */
+            padding: 12px 15px;
+            gap: 10px;
+        }
+        .modal-footer button {
+            margin: 0;
+            padding: 8px 20px;
+            flex-shrink: 0;
+        }
+    </style>
 </head>
     <!-- 壁纸切换按钮 -->
     <button id="toggleButton" class="toggle-button" data-tooltip="切换背景" onclick="toggleWallpaper()">切换背景</button>
@@ -15,19 +48,47 @@
     <!-- 公告提示弹窗 -->
     <div id="noticeModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>使用提示（必读）</h3>
+           <div class="modal-header">
+                <h3>使用指南</h3>
             </div>
             <div class="modal-body">
-                <p>鼠标放于网页右上角，当显示切换背景按钮后，可以切换为动态、静态背景壁纸。</p>
-                <p>搜索引擎可通过搜索框左侧下拉菜单进行切换，支持Bing、Google、Yahoo、Yandex、B站、抖音等。</p>
-                <p>搜索框下方会根据输入内容，实时显示搜索建议，点击建议可快速搜索。仅Google、Bing有公开的API支持搜索建议提示，其他引擎不支持。</p>
-                <p>哔哩哔哩、抖音这两个是视频，搜索出来跳转的内容与其平台有关，仅为方便搜视频使用，不建议平时作为搜索引擎使用！</p>
-                <p>右键点击起始页任意位置，可打开捷径菜单，支持编辑（删除）、新建（自定义快捷方式）、导入（恢复json）、导出（备份json）自己的快捷方式等功能。</p>
-                <p>长按捷径里面的快捷方式可以拖动排序哦。</p>
-                <p>如果有任何问题或建议，欢迎给我发邮件：<a href="mailto:2016122123.jou@vip.163.com">2016122123.jou@vip.163.com</a>
-                <p>点击不再提示，以后每次进入起始页不在弹出此弹窗（如果清除浏览器Cookie会丢失所有记录哦，包括捷径的快捷方式，平时注意备份！）。</p>
-                <!-- 可添加更多提示内容 -->
+                <h4>1. 背景切换</h4>
+                <ul>
+                    <li>将鼠标移至页面右上角，待切换背景按钮出现后，点击即可切换动态/静态壁纸。</li>
+                </ul>
+                
+                <h4>2. 搜索引擎</h4>
+                <ul>
+                    <li>通过搜索框左侧下拉菜单切换搜索引擎，支持Bing、Google、Yahoo、Yandex等。</li>
+                    <li><strong>注意</strong>：B站、抖音为视频平台搜索，仅建议用于查找视频内容。</li>
+                </ul>
+                
+                <h4>3. 搜索建议</h4>
+                <ul>
+                    <li>输入内容时，搜索框下方会显示搜索建议（仅Google、Bing支持），点击建议可快速搜索。</li>
+                </ul>
+                
+                <h4>4. 捷径菜单</h4>
+                <ul>
+                    <li><strong>呼出方式</strong>：在页面非搜索框区域右键点击，即可打开捷径菜单。</li>
+                    <li>功能：支持编辑（删除）、新建（自定义网址）、导入/导出（备份/恢复快捷方式）。</li>
+                </ul>
+                
+                <h4>5. 快捷方式排序</h4>
+                <ul>
+                    <li>可长按快捷方式进行拖动排序，建议通过导出JSON文件编辑顺序后重新导入，以获得更好体验。</li>
+                </ul>
+                
+                <h4>6. 重要提示</h4>
+                <ul>
+                    <li>点击「不再提示」后，将不再显示本弹窗。</li>
+                    <li><strong>数据安全</strong>：清除浏览器Cookie会丢失所有设置和快捷方式，请定期通过「导出」功能备份数据。</li>
+                </ul>
+                
+                <h4>7. 反馈与建议</h4>
+                <ul>
+                    <li>如有问题，欢迎发送邮件至：<a href="mailto:2016122123.jou@vip.163.com">2016122123.jou@vip.163.com</a></li>
+                </ul>
             </div>
             <div class="modal-footer">
                 <button id="btnNotShowAgain">不再提示</button>

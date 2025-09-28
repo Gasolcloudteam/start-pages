@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectButton = document.getElementById('selectEngineBtn');
         const suggestionsList = document.getElementById('suggestionsList');
         const searchContainer = document.querySelector('.search-container');
+        const contextMenu = document.getElementById('contextMenu');
         
         if (!selectButton.contains(e.target) && !engineMenu.contains(e.target)) {
             engineMenu.style.display = 'none';
@@ -79,6 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!searchContainer.contains(e.target)) {
             suggestionsList.style.display = 'none';
+        }
+        
+        // 点击菜单外区域关闭右键菜单
+        if (!contextMenu.contains(e.target) && !searchContainer.contains(e.target)) {
+            contextMenu.style.display = 'none';
         }
     });
 });
@@ -114,18 +120,20 @@ function initContextMenu() {
     const btnNew = document.getElementById('btnNew');
     const btnImport = document.getElementById('btnImport');
     const btnExport = document.getElementById('btnExport');
+    const searchContainer = document.querySelector('.search-container');
     
     // 右键菜单显示
     document.addEventListener('contextmenu', (e) => {
+        // 如果点击搜索框区域，使用默认右键菜单
+        if (searchContainer.contains(e.target)) {
+            return; // 不阻止默认行为
+        }
+        
         e.preventDefault();
         contextMenu.style.display = 'block';
-    });
-    
-    // 点击其他区域关闭右键菜单
-    document.addEventListener('click', (e) => {
-        if (!contextMenu.contains(e.target)) {
-            contextMenu.style.display = 'none';
-        }
+        // 移除JS定位，使用CSS居中
+        contextMenu.style.left = '';
+        contextMenu.style.top = '';
     });
     
     // 关闭按钮
@@ -146,7 +154,7 @@ function initContextMenu() {
     btnImport.addEventListener('click', importShortcuts);
 }
 
-// 加载快捷方式（服务器环境下读取本地JSON文件）
+// 加载快捷方式（服务器环境下读取本地JSON）
 function loadShortcuts() {
     const saved = localStorage.getItem('shortcuts');
     if (saved) {
@@ -204,15 +212,18 @@ function loadShortcuts() {
         });
 }
 
-// 渲染快捷方式
+// 渲染快捷方式（恢复CSS Grid布局）
 function renderShortcuts() {
     const container = document.getElementById('shortcutsContainer');
     container.innerHTML = '';
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    container.style.gap = '10px';
     
     shortcuts.forEach((shortcut, index) => {
         const item = document.createElement('div');
         item.className = 'shortcut-item';
-        item.draggable = true;
+        item.setAttribute('data-index', index);
         item.setAttribute('data-url', shortcut.url);
         item.innerHTML = `
             <span>${shortcut.name}</span>
@@ -232,320 +243,185 @@ function renderShortcuts() {
             deleteShortcut(index);
         });
         
-        // 拖放事件
-        item.addEventListener('dragstart', handleDragStart);
-        item.addEventListener('dragend', handleDragEnd);
+        // 初始化拖拽事件（修复版：添加点击阈值）
+        initItemDrag(item);
         
         container.appendChild(item);
     });
-    
-    // 初始化拖放容器事件
-    initDragContainerEvents();
 }
 
-// 拖放容器事件处理
-function initDragContainerEvents() {
-    const container = document.getElementById('shortcutsContainer');
+// 初始化拖拽事件（修复版：添加点击阈值判断）
+function initItemDrag(item) {
+    let startX, startY, offsetX, offsetY;
+    let isDragging = false;
+    let isClick = true; // 默认为点击
+    let initialIndex, currentIndex;
+    let items, container, placeholder;
+    let originalOrder = [];
+    let containerRect;
+    const DRAG_THRESHOLD = 5; // 拖拽阈值（像素）
     
-    // 移除已存在的事件监听，避免重复绑定
-    container.removeEventListener('dragover', handleDragOver);
-    container.removeEventListener('dragenter', handleDragEnter);
+    // 鼠标按下开始拖拽
+    item.addEventListener('mousedown', startDrag);
     
-    container.addEventListener('dragover', handleDragOver);
-    container.addEventListener('dragenter', handleDragEnter);
-}
-
-// 拖动状态变量
-let draggingItem = null;
-let placeholder = null;
-let initialX = 0;
-let initialY = 0;
-let startX = 0;
-let startY = 0;
-let lastUpdateTime = 0;
-const UPDATE_THROTTLE = 60; // 限制更新频率（毫秒）
-let lastPositionUpdate = 0;
-let elementPositions = new Map(); // 缓存元素位置信息
-let currentAfterElement = null;
-let initialDragDirection = null; // 初始拖动方向
-let dragDistance = 0; // 拖动距离
-
-// 拖动开始处理
-function handleDragStart(e) {
-    // 精确选择拖动元素
-    draggingItem = e.target.closest('.shortcut-item');
-    if (!draggingItem) return;
-    
-    // 记录初始位置用于方向判断
-    startX = e.clientX;
-    startY = e.clientY;
-    
-    // 重置拖动状态
-    initialDragDirection = null;
-    dragDistance = 0;
-    
-    // 记录初始位置
-    const rect = draggingItem.getBoundingClientRect();
-    initialX = e.clientX - rect.left;
-    initialY = e.clientY - rect.top;
-    
-    // 创建单一占位符
-    placeholder = document.createElement('div');
-    placeholder.className = 'shortcut-item placeholder';
-    placeholder.style.height = `${draggingItem.offsetHeight}px`;
-    placeholder.style.width = `${draggingItem.offsetWidth}px`;
-    
-    // 初始化位置缓存
-    updateElementPositions();
-    
-    // 添加拖动样式（使用setTimeout确保样式应用）
-    setTimeout(() => {
-        draggingItem.classList.add('dragging');
-        draggingItem.parentNode.insertBefore(placeholder, draggingItem);
-        draggingItem.style.position = 'fixed';
-        draggingItem.style.width = `${draggingItem.offsetWidth}px`;
-        updateDraggingPosition(e);
-    }, 0);
-}
-
-// 拖动过程处理
-function handleDragOver(e) {
-    e.preventDefault();
-    if (!draggingItem || !placeholder) return;
-    
-    // 计算拖动距离
-    dragDistance = Math.sqrt(Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2));
-    
-    // 确定拖动方向（仅在拖动一定距离后）
-    if (!initialDragDirection && dragDistance > 10) { // 拖动超过10px才确定方向
-        initialDragDirection = Math.abs(e.clientX - startX) > Math.abs(e.clientY - startY) ? 
-            'horizontal' : 'vertical';
+    function startDrag(e) {
+        // 忽略右键点击
+        if (e.button !== 0) return;
         
-        // 添加水平拖动类，用于特殊样式
-        if (initialDragDirection === 'horizontal') {
-            draggingItem.classList.add('horizontal-drag');
-        }
+        // 获取容器和项目信息
+        container = document.getElementById('shortcutsContainer');
+        containerRect = container.getBoundingClientRect();
+        items = Array.from(container.querySelectorAll('.shortcut-item'));
+        initialIndex = parseInt(item.getAttribute('data-index'));
+        currentIndex = initialIndex;
+        
+        // 保存原始顺序
+        originalOrder = [...shortcuts];
+        
+        // 计算鼠标在元素内的偏移量
+        const rect = item.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        
+        // 记录起始鼠标位置
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        // 初始状态为点击
+        isClick = true;
+        
+        // 添加事件监听
+        document.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', endDrag);
+        
+        // 阻止默认行为
+        e.preventDefault();
     }
     
-    // 使用requestAnimationFrame优化动画更新
-    requestAnimationFrame(() => {
-        updateDraggingPosition(e);
+    function handleDrag(e) {
+        if (!containerRect) return;
         
-        // 缓存元素位置信息（每100ms更新一次）
-        const now = Date.now();
-        if (!lastPositionUpdate || now - lastPositionUpdate > 100) {
-            updateElementPositions();
-            lastPositionUpdate = now;
-        }
+        // 计算移动距离
+        const dx = Math.abs(e.clientX - startX);
+        const dy = Math.abs(e.clientY - startY);
         
-        // 找到插入位置
-        const afterElement = getDragAfterElement(draggingItem.parentNode, e.clientX, e.clientY);
-        
-        // 移动占位符（仅在位置变化时更新）
-        if (afterElement !== currentAfterElement) {
-            currentAfterElement = afterElement;
-            if (afterElement) {
-                draggingItem.parentNode.insertBefore(placeholder, afterElement);
-            } else {
-                draggingItem.parentNode.appendChild(placeholder);
+        // 判断是否超过拖拽阈值
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+            if (isClick) {
+                // 超过阈值，标记为拖拽并初始化
+                isClick = false;
+                isDragging = true;
+                item.classList.add('dragging');
+                item.style.zIndex = '1000';
+                
+                // 创建并插入占位符
+                placeholder = document.createElement('div');
+                placeholder.className = 'shortcut-item placeholder';
+                placeholder.style.height = `${item.offsetHeight}px`;
+                placeholder.style.width = `${item.offsetWidth}px`;
+                item.parentNode.insertBefore(placeholder, item);
             }
-        }
-    });
-}
-
-// 拖动进入处理（增强边界判断）
-function handleDragEnter(e) {
-    e.preventDefault();
-    if (!draggingItem || !placeholder) return;
-    
-    const container = document.getElementById('shortcutsContainer');
-    const containerRect = container.getBoundingClientRect();
-    
-    // 水平方向边界判断
-    if (initialDragDirection === 'horizontal') {
-        // 左侧边界判断 - 拖到最左边
-        if (e.clientX < containerRect.left + 30) {
-            container.insertBefore(placeholder, container.firstChild);
-            currentAfterElement = container.firstChild;
-            return;
-        }
-        
-        // 右侧边界判断 - 拖到最右边
-        if (e.clientX > containerRect.right - 30) {
-            container.appendChild(placeholder);
-            currentAfterElement = null;
-            return;
-        }
-    } 
-    // 垂直方向边界判断
-    else {
-        // 顶部边界判断 - 拖到最前面
-        if (e.clientY < containerRect.top + 30) {
-            container.insertBefore(placeholder, container.firstChild);
-            currentAfterElement = container.firstChild;
-            return;
-        }
-        
-        // 底部边界判断 - 拖到最后面
-        if (e.clientY > containerRect.bottom - 30) {
-            container.appendChild(placeholder);
-            currentAfterElement = null;
-            return;
+            
+            // 更新拖拽位置
+            updateDraggingPosition(e);
+            updatePlaceholderPosition(e);
         }
     }
-}
-
-// 拖动结束处理
-function handleDragEnd() {
-    if (!draggingItem) return;
     
-    // 移除拖动类
-    draggingItem.classList.remove('dragging', 'horizontal-drag');
-    draggingItem.removeAttribute('style');
-    
-    // 移除占位符并更新排序
-    if (placeholder) {
-        // 将拖动元素插入到占位符位置
-        placeholder.parentNode.insertBefore(draggingItem, placeholder);
-        placeholder.remove();
+    function updateDraggingPosition(e) {
+        // 计算相对于容器的位置
+        const relativeX = e.clientX - containerRect.left - offsetX;
+        const relativeY = e.clientY - containerRect.top - offsetY;
+        
+        // 使用fixed定位确保跟随鼠标
+        item.style.position = 'fixed';
+        item.style.width = `${item.offsetWidth}px`;
+        item.style.left = `${e.clientX - offsetX}px`;
+        item.style.top = `${e.clientY - offsetY}px`;
+        item.style.transform = 'none';
     }
     
-    // 更新数据并重置状态
-    updateShortcutsOrder();
-    draggingItem = null;
-    placeholder = null;
-    initialX = 0;
-    initialY = 0;
-    startX = 0;
-    startY = 0;
-    currentAfterElement = null;
-    elementPositions.clear();
-}
-
-// 更新拖动元素位置，添加滚动补偿
-function updateDraggingPosition(e) {
-    if (!draggingItem) return;
-    
-    // 获取当前滚动位置
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    
-    // 计算新位置（考虑滚动偏移）
-    const x = e.clientX - initialX + scrollLeft;
-    const y = e.clientY - initialY + scrollTop;
-    
-    draggingItem.style.left = `${x}px`;
-    draggingItem.style.top = `${y}px`;
-}
-
-// 批量更新元素位置缓存
-function updateElementPositions() {
-    elementPositions.clear();
-    const draggableElements = document.querySelectorAll('.shortcut-item:not(.dragging):not(.placeholder)');
-    const container = document.getElementById('shortcutsContainer');
-    const containerRect = container.getBoundingClientRect();
-    
-    draggableElements.forEach(element => {
-        const rect = element.getBoundingClientRect();
-        // 同时保存绝对位置和相对容器位置
-        elementPositions.set(element, {
-            // 绝对位置
-            top: rect.top,
-            bottom: rect.bottom,
-            left: rect.left,
-            right: rect.right,
-            // 相对容器位置
-            relLeft: rect.left - containerRect.left,
-            relTop: rect.top - containerRect.top,
-            // 尺寸
-            width: rect.width,
-            height: rect.height,
-            // 中心点
-            centerX: rect.left + rect.width / 2,
-            centerY: rect.top + rect.height / 2,
-            relCenterX: (rect.left - containerRect.left) + rect.width / 2
+    function updatePlaceholderPosition(e) {
+        if (!placeholder) return;
+        
+        // 将鼠标位置转换为相对于容器的坐标
+        const mouseX = e.clientX - containerRect.left;
+        const mouseY = e.clientY - containerRect.top;
+        
+        // 遍历其他元素检查碰撞
+        items.forEach((otherItem, index) => {
+            if (otherItem === item || otherItem === placeholder) return;
+            
+            const otherRect = otherItem.getBoundingClientRect();
+            const otherCenterX = otherRect.left - containerRect.left + otherRect.width / 2;
+            const otherCenterY = otherRect.top - containerRect.top + otherRect.height / 2;
+            
+            // 二维碰撞检测
+            const isHorizontalOverlap = Math.abs(mouseX - otherCenterX) < otherRect.width * 0.55;
+            const isVerticalOverlap = Math.abs(mouseY - otherCenterY) < otherRect.height * 0.55;
+            
+            if (isHorizontalOverlap && isVerticalOverlap && index !== currentIndex) {
+                currentIndex = index;
+                
+                // 根据网格布局特点决定插入位置
+                if (mouseX < otherCenterX) {
+                    otherItem.parentNode.insertBefore(placeholder, otherItem);
+                } else {
+                    otherItem.parentNode.insertBefore(placeholder, otherItem.nextSibling);
+                }
+                
+                // 强制同步元素索引
+                syncItemIndexes();
+            }
         });
-    });
-}
-
-// 优化的位置计算函数（重点优化从右向左拖动）
-function getDragAfterElement(container, x, y) {
-    const draggableElements = [...container.querySelectorAll('.shortcut-item:not(.dragging):not(.placeholder)')];
-    
-    // 记录最小距离和对应元素
-    let closestElement = null;
-    let minDistance = Number.POSITIVE_INFINITY;
-    let closestOffset = 0;
-    
-    // 判断拖动方向
-    const isHorizontalDrag = initialDragDirection === 'horizontal' || 
-                            (Math.abs(x - startX) > Math.abs(y - startY) && dragDistance > 10);
-    
-    // 获取容器位置，用于相对坐标计算
-    const containerRect = container.getBoundingClientRect();
-    
-    draggableElements.forEach(element => {
-        const pos = elementPositions.get(element);
-        if (!pos) return;
-        
-        // 根据拖动方向动态调整权重，水平方向增加x轴权重
-        const weightX = isHorizontalDrag ? 1.2 : 0.5; // 水平拖动时增加x轴权重
-        const weightY = isHorizontalDrag ? 0.5 : 1;
-        
-        // 计算相对容器的坐标（而非视口绝对坐标）
-        const relX = x - containerRect.left;
-        const offsetX = (relX - pos.relCenterX) * weightX;
-        
-        // 垂直方向使用绝对坐标
-        const offsetY = (y - pos.centerY) * weightY;
-        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-        
-        // 更新最近元素
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestElement = element;
-            closestOffset = isHorizontalDrag ? offsetX : offsetY;
-        }
-    });
-    
-    if (!closestElement) return null;
-    
-    // 获取元素尺寸用于阈值计算
-    const elementSize = isHorizontalDrag ? 
-        elementPositions.get(closestElement).width : 
-        elementPositions.get(closestElement).height;
-    
-    // 根据拖动方向和方向动态调整阈值
-    let threshold = elementSize * 0.5; // 默认阈值
-    
-    // 从右向左拖动时降低阈值，提高灵敏度
-    if (isHorizontalDrag && x < startX) { 
-        threshold = elementSize * 0.4; 
     }
     
-    // 添加方向补偿，解决从右向左拖动的偏移问题
-    const directionCompensation = isHorizontalDrag && x < startX ? elementSize * 0.05 : 0;
+    // 同步所有元素的索引属性与DOM顺序
+    function syncItemIndexes() {
+        const items = container.querySelectorAll('.shortcut-item:not(.placeholder)');
+        items.forEach((el, i) => {
+            el.setAttribute('data-index', i);
+        });
+    }
     
-    return (closestOffset + directionCompensation) > threshold ? 
-        closestElement.nextSibling : closestElement;
-}
-
-// 更新排序数据
-function updateShortcutsOrder() {
-    const container = document.getElementById('shortcutsContainer');
-    const items = Array.from(container.querySelectorAll('.shortcut-item:not(.placeholder)'));
-    
-    // 直接从DOM元素获取当前顺序和数据
-    const newOrder = items.map(item => {
-        return {
-            name: item.querySelector('span').textContent,
-            url: item.getAttribute('data-url')
-        };
-    });
-    
-    // 更新数据并保存
-    shortcuts = newOrder;
-    saveShortcuts();
+    function endDrag() {
+        // 清理事件
+        document.removeEventListener('mousemove', handleDrag);
+        document.removeEventListener('mouseup', endDrag);
+        
+        if (!isClick && isDragging) {
+            // 移除拖拽状态
+            item.classList.remove('dragging');
+            item.removeAttribute('style');
+            
+            // 移除占位符并插入元素
+            if (placeholder) {
+                // 获取最终位置并同步
+                const finalIndex = Array.from(container.children).indexOf(placeholder);
+                placeholder.parentNode.insertBefore(item, placeholder);
+                placeholder.remove();
+                
+                // 同步索引
+                syncItemIndexes();
+                
+                // 更新数据
+                if (finalIndex !== initialIndex) {
+                    const [movedItem] = originalOrder.splice(initialIndex, 1);
+                    originalOrder.splice(finalIndex, 0, movedItem);
+                    shortcuts = [...originalOrder];
+                    saveShortcuts();
+                    renderShortcuts();
+                }
+            }
+            
+            // 重置状态
+            isDragging = false;
+            placeholder = null;
+        }
+        
+        // 重置状态
+        containerRect = null;
+    }
 }
 
 // 保存快捷方式到本地存储
